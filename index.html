@@ -1,1 +1,123 @@
-<h1>Привет!</h1>
+
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Kaspi Seller Assistant</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-chartjs-2/dist/react-chartjs-2.min.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+        max-width: 1000px;
+        margin: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background: #f0f0f0;
+      }
+      input, button {
+        margin: 5px 0;
+        padding: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Kaspi Seller Assistant</h1>
+    <div id="root">Загрузка приложения...</div>
+
+    <script type="module">
+      import { createRoot } from 'https://cdn.jsdelivr.net/npm/react-dom@18.2.0/client/index.min.js';
+
+      const { useState } = React;
+
+      const initialSales = [
+        { date: "2025-04-01", item: "Ручка", quantity: 5, total: 500 },
+        { date: "2025-04-02", item: "Блокнот", quantity: 3, total: 1050 },
+        { date: "2025-04-03", item: "USB", quantity: 2, total: 5000 },
+      ];
+
+      function App() {
+        const [sales, setSales] = useState(initialSales);
+        const [form, setForm] = useState({ date: "", item: "", quantity: 1, total: 0 });
+
+        const handleAddSale = () => {
+          if (form.date && form.item && form.quantity && form.total) {
+            setSales([...sales, form]);
+            setForm({ date: "", item: "", quantity: 1, total: 0 });
+          }
+        };
+
+        const totalRevenue = sales.reduce((sum, s) => sum + Number(s.total), 0);
+        const dates = [...new Set(sales.map((s) => s.date))];
+        const salesPerDate = dates.map((d) =>
+          sales.filter((s) => s.date === d).reduce((sum, s) => sum + Number(s.total), 0)
+        );
+
+        return React.createElement("div", null,
+          React.createElement("div", null,
+            React.createElement("h2", null, "Добавить продажу"),
+            React.createElement("input", {
+              type: "date",
+              value: form.date,
+              onChange: e => setForm({ ...form, date: e.target.value })
+            }),
+            React.createElement("input", {
+              placeholder: "Товар",
+              value: form.item,
+              onChange: e => setForm({ ...form, item: e.target.value })
+            }),
+            React.createElement("input", {
+              type: "number",
+              placeholder: "Кол-во",
+              value: form.quantity,
+              onChange: e => setForm({ ...form, quantity: Number(e.target.value) })
+            }),
+            React.createElement("input", {
+              type: "number",
+              placeholder: "Сумма",
+              value: form.total,
+              onChange: e => setForm({ ...form, total: Number(e.target.value) })
+            }),
+            React.createElement("button", { onClick: handleAddSale }, "Добавить")
+          ),
+          React.createElement("h2", null, "История продаж"),
+          React.createElement("table", null,
+            React.createElement("thead", null,
+              React.createElement("tr", null,
+                React.createElement("th", null, "Дата"),
+                React.createElement("th", null, "Товар"),
+                React.createElement("th", null, "Кол-во"),
+                React.createElement("th", null, "Сумма")
+              )
+            ),
+            React.createElement("tbody", null,
+              sales.map((s, idx) => React.createElement("tr", { key: idx },
+                React.createElement("td", null, s.date),
+                React.createElement("td", null, s.item),
+                React.createElement("td", null, s.quantity),
+                React.createElement("td", null, `${s.total} ₸`)
+              ))
+            )
+          ),
+          React.createElement("p", { style: { fontWeight: "bold" } }, `Общая выручка: ${totalRevenue} ₸`)
+        );
+      }
+
+      const root = createRoot(document.getElementById('root'));
+      root.render(React.createElement(App));
+    </script>
+  </body>
+</html>
